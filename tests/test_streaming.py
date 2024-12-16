@@ -2,15 +2,18 @@ import pytest
 import asyncio
 from lingualearn.streaming import StreamingServer
 
+
 @pytest.fixture
 def streaming_server():
     return StreamingServer()
+
 
 @pytest.mark.asyncio
 async def test_streaming_initialization(streaming_server):
     assert streaming_server is not None
     assert streaming_server.connections == {}
     assert streaming_server.logger is not None
+
 
 @pytest.mark.asyncio
 async def test_create_streaming_session(streaming_server):
@@ -24,6 +27,7 @@ async def test_create_streaming_session(streaming_server):
     assert session_id in streaming_server.connections
     assert streaming_server.connections[session_id]['config'] == session_config
 
+
 @pytest.mark.asyncio
 async def test_close_streaming_session(streaming_server):
     session_config = {
@@ -35,6 +39,7 @@ async def test_close_streaming_session(streaming_server):
     session_id = await streaming_server.create_session(session_config)
     await streaming_server.close_session(session_id)
     assert session_id not in streaming_server.connections
+
 
 @pytest.mark.asyncio
 async def test_get_active_streams(streaming_server):
