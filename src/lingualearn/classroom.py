@@ -1,7 +1,7 @@
 import asyncio
 import logging
 import uuid
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 
 
 class ClassroomManager:
@@ -37,10 +37,10 @@ class ClassroomManager:
         if session_id in self.active_sessions:
             del self.active_sessions[session_id]
 
-    def get_active_sessions(self) -> list:
+    def get_active_sessions(self) -> List[str]:
         """Get list of active classroom sessions
 
         Returns:
-            list: List of active session identifiers
+            List[str]: List of active session identifiers
         """
         return list(self.active_sessions.keys())

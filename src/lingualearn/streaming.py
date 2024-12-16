@@ -1,7 +1,7 @@
 import asyncio
 import logging
 import uuid
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 
 
 class StreamingServer:
@@ -37,10 +37,10 @@ class StreamingServer:
         if session_id in self.connections:
             del self.connections[session_id]
 
-    def get_active_streams(self) -> list:
+    def get_active_streams(self) -> List[str]:
         """Get list of active streaming sessions
 
         Returns:
-            list: List of active session identifiers
+            List[str]: List of active session identifiers
         """
         return list(self.connections.keys())
