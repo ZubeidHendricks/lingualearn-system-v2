@@ -2,6 +2,7 @@ import pytest
 import asyncio
 from lingualearn.translation import TranslationCore, TranslationConfig
 
+
 @pytest.fixture
 def translation_config():
     return TranslationConfig(
@@ -9,12 +10,14 @@ def translation_config():
         enable_streaming=True,
         offline_fallback=True,
         buffer_size=2048,
-        max_latency=100
+        max_latency=100,
     )
+
 
 @pytest.fixture
 def translation_core(translation_config):
     return TranslationCore(translation_config)
+
 
 @pytest.fixture
 def event_loop():
