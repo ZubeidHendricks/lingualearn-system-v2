@@ -21,30 +21,33 @@ jobs:
       uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
-        cache: 'pip'
     
-    - name: Install dependencies
+    - name: Install package and dev dependencies
       run: |
-        python -m pip install --upgrade pip
-        python -m pip install build wheel
-        pip install -e .
-        pip install pytest pytest-asyncio pytest-cov flake8 black isort
+        python -m pip install --upgrade pip wheel setuptools
+        # Install the package in editable mode with dev dependencies
+        pip install -e ".[dev]"
+        # Show installed packages for debugging
         pip freeze
     
-    - name: List directory structure
-      run: ls -R
-    
-    - name: Lint with flake8
+    - name: Show package structure
       run: |
+        echo "Project structure:"
+        find . -type f -name "*.py"
+    
+    - name: Run pytest
+      run: |
+        echo "Running tests with pytest..."
+        pytest -v tests/ --tb=short
+
+    - name: Run linting checks
+      if: always()  # Run even if tests fail
+      run: |
+        echo "Running flake8..."
         flake8 src tests --count --show-source --statistics
-      continue-on-error: true
-    
-    - name: Check formatting
-      run: |
+        
+        echo "\nChecking black formatting..."
         black --check --diff src tests
+        
+        echo "\nChecking import sorting..."
         isort --check-only --diff src tests
-      continue-on-error: true
-    
-    - name: Test with pytest
-      run: |
-        python -m pytest tests/ -v --cov=lingualearn --cov-report=term-missing
