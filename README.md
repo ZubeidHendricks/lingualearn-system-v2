@@ -17,27 +17,42 @@ LinguaLearn bridges language barriers in South African education using AI transl
 - Student progress tracking
 - Content adaptation system
 
-## Installation
-
-```bash
-pip install -r requirements.txt
-```
-
 ## Project Structure
 
 ```
 lingualearn/
 ├── src/
 │   └── lingualearn/
-│       ├── __init__.py
-│       ├── translation.py      # Core translation system
+│       ├── __init__.py          # Package initialization
+│       ├── translation.py       # Core translation system
 │       ├── classroom.py        # Classroom management
-│       ├── streaming.py        # Real-time streaming
-│       └── analytics.py        # Learning analytics
-├── tests/
-├── docs/
-└── requirements.txt
+│       └── streaming.py        # Real-time streaming
+├── tests/                    # Test directory
+└── requirements.txt         # Project dependencies
 ```
+
+## Installation
+
+1. Clone the repository:
+```bash
+git clone https://github.com/ZubeidHendricks/lingualearn-system.git
+cd lingualearn-system
+```
+
+2. Create a virtual environment:
+```bash
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+```
+
+3. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+## Usage
+
+Detailed usage instructions coming soon.
 
 ## Contributing
 
