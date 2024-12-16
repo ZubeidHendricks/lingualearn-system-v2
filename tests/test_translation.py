@@ -26,7 +26,7 @@ async def test_custom_translation_config():
         enable_streaming=False,
         offline_fallback=True,
         buffer_size=4096,
-        max_latency=200
+        max_latency=200,
     )
     core = TranslationCore(config)
     assert core.config.preserve_expression is False
@@ -42,7 +42,7 @@ async def test_logger_initialization(translation_core):
 
 @pytest.fixture
 def mock_audio_data():
-    return b'dummy_audio_data'
+    return b"dummy_audio_data"
 
 
 @pytest.fixture
@@ -57,7 +57,7 @@ async def test_translation_with_invalid_mode(translation_core, mock_audio_data):
             content=mock_audio_data,
             source_lang="en",
             target_lang="xho",
-            mode="INVALID_MODE"
+            mode="INVALID_MODE",
         )
 
 
@@ -67,15 +67,15 @@ async def test_offline_fallback(translation_core, mock_audio_data):
     translation_core._translate_batch = asyncio.coroutine(
         lambda *args, **kwargs: raise_(Exception("Translation failed"))
     )
-    
+
     result = await translation_core.translate(
         content=mock_audio_data,
         source_lang="en",
         target_lang="xho",
-        mode=TranslationMode.SPEECH_TO_SPEECH
+        mode=TranslationMode.SPEECH_TO_SPEECH,
     )
-    
-    assert result['status'] == 'success_offline'
+
+    assert result["status"] == "success_offline"
 
 
 def raise_(ex):
