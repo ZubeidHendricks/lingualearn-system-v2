@@ -1,0 +1,179 @@
+openapi: 3.0.0
+info:
+  title: LinguaLearn API
+  description: API for the LinguaLearn system - AI-powered indigenous language learning
+  version: 2.0.0
+
+servers:
+  - url: http://localhost:8000
+    description: Development server
+
+paths:
+  /api/process-image:
+    post:
+      summary: Process an image for object detection
+      description: Upload and process an image to detect objects and get indigenous terms
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Successful image processing
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProcessImageResponse'
+        '500':
+          description: Server error
+
+  /api/languages:
+    post:
+      summary: Add a new language
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LanguageCreate'
+      responses:
+        '200':
+          description: Language added successfully
+
+  /api/terms:
+    post:
+      summary: Add a new indigenous term
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TermCreate'
+      responses:
+        '200':
+          description: Term added successfully
+
+  /api/terms/{language_code}:
+    get:
+      summary: Get terms for a specific language
+      parameters:
+        - name: language_code
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of terms
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TermResponse'
+
+  /api/statistics:
+    get:
+      summary: Get system statistics
+      responses:
+        '200':
+          description: System statistics
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total_images:
+                    type: integer
+                  total_terms:
+                    type: integer
+                  total_languages:
+                    type: integer
+                  recent_contributions:
+                    type: integer
+
+components:
+  schemas:
+    DetectionResponse:
+      type: object
+      properties:
+        label:
+          type: string
+        confidence:
+          type: number
+          format: float
+        bbox:
+          type: array
+          items:
+            type: number
+        indigenousTerm:
+          type: string
+
+    ProcessImageResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        detections:
+          type: array
+          items:
+            $ref: '#/components/schemas/DetectionResponse'
+        image_id:
+          type: integer
+
+    LanguageCreate:
+      type: object
+      properties:
+        code:
+          type: string
+        name:
+          type: string
+        region:
+          type: string
+      required:
+        - code
+        - name
+
+    TermCreate:
+      type: object
+      properties:
+        language_id:
+          type: integer
+        object_id:
+          type: integer
+        term:
+          type: string
+        pronunciation:
+          type: string
+        context:
+          type: string
+        source:
+          type: string
+      required:
+        - language_id
+        - object_id
+        - term
+
+    TermResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        term:
+          type: string
+        language_code:
+          type: string
+        object_label:
+          type: string
+        pronunciation:
+          type: string
+        context:
+          type: string
+        verified:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
