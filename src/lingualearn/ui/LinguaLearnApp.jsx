@@ -1,13 +1,49 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
 import { Button } from '../../components/ui/button';
 import { Camera, Book, Settings, Globe } from 'lucide-react';
+import CameraView from './CameraView';
 
 const LinguaLearnApp = () => {
     const [activeTab, setActiveTab] = useState('camera');
     const [currentLanguage, setCurrentLanguage] = useState('xho');
     const [userRegion, setUserRegion] = useState('Western Cape');
-    const [learningMode, setLearningMode] = useState('linguist'); // 'linguist' or 'student'
+    const [learningMode, setLearningMode] = useState('linguist');
+    const [detectedObjects, setDetectedObjects] = useState([]);
+    const [isProcessing, setIsProcessing] = useState(false);
+
+    const handleCapture = useCallback(async (frameData) => {
+        setIsProcessing(true);
+        try {
+            // For testing, return a mock result
+            return {
+                success: true,
+                object: {
+                    name: 'Test Object',
+                    local_term: 'Test Term',
+                    confidence: 0.95
+                }
+            };
+        } catch (error) {
+            console.error('Object detection error:', error);
+            return { success: false, error: error.message };
+        } finally {
+            setIsProcessing(false);
+        }
+    }, []);
+
+    const handleRecordTerm = useCallback(async () => {
+        try {
+            // For testing, return a mock result
+            return {
+                success: true,
+                text: 'Test recording'
+            };
+        } catch (error) {
+            console.error('Recording error:', error);
+            return { success: false, error: error.message };
+        }
+    }, []);
 
     return (
         <div className="h-screen flex flex-col bg-gray-100">
@@ -40,7 +76,7 @@ const LinguaLearnApp = () => {
             </header>
 
             {/* Main content */}
-            <main className="flex-1 overflow-hidden">
+            <main className="flex-1 overflow-hidden bg-gray-50">
                 <Tabs
                     value={activeTab}
                     onValueChange={setActiveTab}
@@ -61,15 +97,31 @@ const LinguaLearnApp = () => {
                         </TabsTrigger>
                     </TabsList>
 
-                    <TabsContent value="camera" className="flex-1 p-4">
-                        <div className="h-full rounded-lg bg-white shadow-sm p-4">
-                            Camera View Coming Soon
-                        </div>
+                    <TabsContent value="camera" className="flex-1 p-4 h-full">
+                        <CameraView
+                            onCapture={handleCapture}
+                            onRecordTerm={{
+                                start: handleRecordTerm,
+                                stop: handleRecordTerm
+                            }}
+                        />
                     </TabsContent>
 
                     <TabsContent value="dictionary" className="flex-1 p-4">
                         <div className="h-full rounded-lg bg-white shadow-sm p-4">
-                            Dictionary View Coming Soon
+                            <h2 className="text-xl font-semibold mb-4">Object Dictionary</h2>
+                            {detectedObjects.length > 0 ? (
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                    {detectedObjects.map((obj, index) => (
+                                        <div key={index} className="p-4 border rounded-lg">
+                                            <h3 className="font-medium">{obj.name}</h3>
+                                            <p className="text-gray-600">{obj.local_term}</p>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <p className="text-gray-500">No objects detected yet. Use the camera to start learning!</p>
+                            )}
                         </div>
                     </TabsContent>
 
