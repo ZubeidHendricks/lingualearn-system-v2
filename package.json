@@ -5,10 +5,10 @@
   "main": "src/main/index.js",
   "private": true,
   "scripts": {
-    "start": "set NODE_OPTIONS=--openssl-legacy-provider && concurrently \"npm run start:react\" \"npm run start:electron\"",
-    "start:react": "set NODE_OPTIONS=--openssl-legacy-provider && cross-env BROWSER=none react-scripts start",
-    "start:electron": "wait-on tcp:3000 && electron .",
-    "build": "set NODE_OPTIONS=--openssl-legacy-provider && react-scripts build && electron-builder",
+    "start": "concurrently \"npm run start:react\" \"npm run start:electron\"",
+    "start:react": "cross-env BROWSER=none react-scripts start",
+    "start:electron": "wait-on tcp:3000 && cross-env NODE_OPTIONS=\"\" electron .",
+    "build": "react-scripts build && electron-builder",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
@@ -23,6 +23,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.23.0",
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@babel/preset-env": "^7.22.20",
     "@babel/preset-react": "^7.22.15",
     "@types/node": "^20.10.0",
