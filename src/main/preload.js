@@ -1,111 +1,51 @@
 const { contextBridge, ipcRenderer } = require('electron');
-const WebSocket = require('ws');
 
-// API exposed to renderer process
-contextBridge.exposeInMainWorld('api', {
-    // Media devices
-    getMediaDevices: () => ipcRenderer.invoke('get-media-devices'),
-    getCameraPermissions: () => ipcRenderer.invoke('get-camera-permissions'),
-    getAudioPermissions: () => ipcRenderer.invoke('get-audio-permissions'),
+// Expose protected methods that allow the renderer process to use
+// specific electron APIs through a secure bridge.
+contextBridge.exposeInMainWorld(
+    'api', {
+        // Camera methods
+        requestCamera: () => ipcRenderer.invoke('request-camera'),
+        stopCamera: () => ipcRenderer.invoke('stop-camera'),
 
-    // Object detection
-    detectObject: async (data) => {
-        try {
-            const response = await fetch('http://localhost:8000/detect-object', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data),
-            });
-            return response.json();
-        } catch (error) {
-            console.error('Failed to detect object:', error);
-            throw error;
+        // Audio methods
+        requestMicrophone: () => ipcRenderer.invoke('request-microphone'),
+        startRecording: () => ipcRenderer.invoke('start-recording'),
+        stopRecording: () => ipcRenderer.invoke('stop-recording'),
+
+        // File system methods
+        saveData: (data) => ipcRenderer.invoke('save-data', data),
+        loadData: () => ipcRenderer.invoke('load-data'),
+
+        // System methods
+        getVersion: () => ipcRenderer.invoke('get-version'),
+        getLanguages: () => ipcRenderer.invoke('get-languages'),
+
+        // Event listeners
+        on: (channel, callback) => {
+            // Whitelist channels we allow
+            const validChannels = [
+                'camera-frame',
+                'recording-data',
+                'object-detected',
+                'term-saved',
+                'error'
+            ];
+            if (validChannels.includes(channel)) {
+                ipcRenderer.on(channel, (event, ...args) => callback(...args));
+            }
+        },
+        off: (channel, callback) => {
+            const validChannels = [
+                'camera-frame',
+                'recording-data',
+                'object-detected',
+                'term-saved',
+                'error'
+            ];
+            if (validChannels.includes(channel)) {
+                ipcRenderer.removeListener(channel, callback);
+            }
         }
-    },
-
-    // Voice recording
-    recordTerm: async (data) => {
-        try {
-            const response = await fetch('http://localhost:8000/record-term', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data),
-            });
-            return response.json();
-        } catch (error) {
-            console.error('Failed to record term:', error);
-            throw error;
-        }
-    },
-
-    // Term management
-    saveTerm: async (data) => {
-        try {
-            const response = await fetch('http://localhost:8000/save-term', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data),
-            });
-            return response.json();
-        } catch (error) {
-            console.error('Failed to save term:', error);
-            throw error;
-        }
-    },
-
-    getStoredTerms: async (language) => {
-        try {
-            const response = await fetch(`http://localhost:8000/terms/${language}`);
-            return response.json();
-        } catch (error) {
-            console.error('Failed to get terms:', error);
-            throw error;
-        }
-    },
-
-    // WebSocket connection
-    connectWebSocket: (callbacks) => {
-        const ws = new WebSocket('ws://localhost:8000/ws');
-
-        ws.onopen = () => {
-            callbacks.onOpen?.();
-        };
-
-        ws.onmessage = (event) => {
-            const data = JSON.parse(event.data);
-            callbacks.onMessage?.(data);
-        };
-
-        ws.onerror = (error) => {
-            callbacks.onError?.(error);
-        };
-
-        ws.onclose = () => {
-            callbacks.onClose?.();
-        };
-
-        return {
-            send: (message) => {
-                if (ws.readyState === WebSocket.OPEN) {
-                    ws.send(JSON.stringify(message));
-                }
-            },
-            close: () => ws.close()
-        };
     }
-});
-
-// Listen for backend process status
-ipcRenderer.on('python-output', (event, data) => {
-    console.log('Python output:', data);
-});
-
-ipcRenderer.on('python-error', (event, data) => {
-    console.error('Python error:', data);
-});
+);
