@@ -6,10 +6,10 @@
   "private": true,
   "scripts": {
     "start": "concurrently \"npm run start:react\" \"npm run start:electron\"",
-    "start:react": "cross-env BROWSER=none react-scripts start",
-    "start:electron": "wait-on tcp:3000 && cross-env NODE_OPTIONS=\"\" electron .",
-    "build": "react-scripts build && electron-builder",
-    "test": "react-scripts test",
+    "start:react": "craco start",
+    "start:electron": "wait-on tcp:3000 && electron .",
+    "build": "craco build && electron-builder",
+    "test": "craco test",
     "eject": "react-scripts eject"
   },
   "dependencies": {
@@ -26,6 +26,7 @@
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@babel/preset-env": "^7.22.20",
     "@babel/preset-react": "^7.22.15",
+    "@craco/craco": "^7.1.0",
     "@types/node": "^20.10.0",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",
