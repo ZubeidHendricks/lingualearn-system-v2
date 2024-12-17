@@ -1,5 +1,5 @@
 import React from 'react';
-import { LinguaLearnApp } from './lingualearn/ui/LinguaLearnApp';
+import LinguaLearnApp from './lingualearn/ui/LinguaLearnApp';
 
 function App() {
   return (
