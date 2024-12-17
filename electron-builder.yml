@@ -1,0 +1,48 @@
+appId: com.lingualearn.app
+productName: LinguaLearn
+copyright: Copyright © 2024 LinguaLearn
+
+directories:
+  output: dist
+  buildResources: assets
+
+files:
+  - from: build
+    to: build
+    filter: ['**/*']
+  - from: src/main
+    to: main
+    filter: ['**/*']
+
+extraResources:
+  - from: src/lingualearn
+    to: backend
+    filter: ['**/*']
+
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+  icon: assets/icon.ico
+
+mac:
+  target:
+    - target: dmg
+      arch:
+        - x64
+        - arm64
+  icon: assets/icon.icns
+  category: public.app-category.education
+
+linux:
+  target:
+    - target: AppImage
+      arch:
+        - x64
+  icon: assets/icon.png
+  category: Education
+
+publish:
+  provider: github
+  private: false
