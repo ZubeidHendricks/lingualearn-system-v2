@@ -9,3 +9,4 @@ pillow==10.2.0
 opencv-python==4.9.0.80
 numpy==1.26.3
 python-dotenv==1.0.0
+alembic==1.13.1
