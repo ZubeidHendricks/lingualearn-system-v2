@@ -1,81 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
+import React, { useState } from 'react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
+import { Button } from '../../components/ui/button';
 import { Camera, Book, Settings, Globe } from 'lucide-react';
-import ObjectLearningView from './ObjectLearningView';
-import ObjectTermList from './ObjectTermList';
 
-export default function LinguaLearnApp() {
+const LinguaLearnApp = () => {
     const [activeTab, setActiveTab] = useState('camera');
     const [currentLanguage, setCurrentLanguage] = useState('xho');
     const [userRegion, setUserRegion] = useState('Western Cape');
     const [learningMode, setLearningMode] = useState('linguist'); // 'linguist' or 'student'
-    const [terms, setTerms] = useState([]);
-
-    // Initialize object learning system
-    useEffect(() => {
-        const initializeLearning = async () => {
-            try {
-                // Load saved terms
-                const savedTerms = await window.api.getStoredTerms(currentLanguage);
-                setTerms(savedTerms);
-            } catch (error) {
-                console.error('Failed to initialize:', error);
-            }
-        };
-
-        initializeLearning();
-    }, [currentLanguage]);
-
-    // Handle object capture
-    const handleCapture = async (captureData) => {
-        try {
-            const result = await window.api.detectObject({
-                point: captureData.point,
-                frame: captureData.frame,
-                language: currentLanguage
-            });
-            return result;
-        } catch (error) {
-            console.error('Capture failed:', error);
-            return { success: false, error: 'Failed to detect object' };
-        }
-    };
-
-    // Handle term recording
-    const handleRecordTerm = async () => {
-        try {
-            const result = await window.api.recordTerm({
-                language: currentLanguage,
-                duration: 5 // seconds
-            });
-            return result;
-        } catch (error) {
-            console.error('Recording failed:', error);
-            return { success: false, error: 'Failed to record term' };
-        }
-    };
-
-    // Save new term
-    const handleSaveTerm = async (termData) => {
-        try {
-            const result = await window.api.saveTerm({
-                ...termData,
-                region: userRegion,
-                added_by: learningMode === 'linguist' ? 'linguist' : 'student'
-            });
-
-            if (result.success) {
-                // Update local terms list
-                setTerms(prevTerms => [...prevTerms, result.term]);
-            }
-
-            return result;
-        } catch (error) {
-            console.error('Save failed:', error);
-            throw error;
-        }
-    };
 
     return (
         <div className="h-screen flex flex-col bg-gray-100">
@@ -130,26 +62,15 @@ export default function LinguaLearnApp() {
                     </TabsList>
 
                     <TabsContent value="camera" className="flex-1 p-4">
-                        <ObjectLearningView
-                            onCapture={handleCapture}
-                            onRecordTerm={handleRecordTerm}
-                            onSaveTerm={handleSaveTerm}
-                            language={currentLanguage}
-                            region={userRegion}
-                            learningMode={learningMode}
-                        />
+                        <div className="h-full rounded-lg bg-white shadow-sm p-4">
+                            Camera View Coming Soon
+                        </div>
                     </TabsContent>
 
-                    <TabsContent value="dictionary" className="flex-1 p-4 overflow-auto">
-                        <ObjectTermList
-                            terms={terms}
-                            onSelectTerm={(term) => {
-                                setActiveTab('camera');
-                                // TODO: Set up camera to find similar object
-                            }}
-                            selectedLanguage={currentLanguage}
-                            onChangeLanguage={setCurrentLanguage}
-                        />
+                    <TabsContent value="dictionary" className="flex-1 p-4">
+                        <div className="h-full rounded-lg bg-white shadow-sm p-4">
+                            Dictionary View Coming Soon
+                        </div>
                     </TabsContent>
 
                     <TabsContent value="settings" className="flex-1 p-4">
@@ -195,4 +116,6 @@ export default function LinguaLearnApp() {
             </main>
         </div>
     );
-}
+};
+
+export default LinguaLearnApp;
