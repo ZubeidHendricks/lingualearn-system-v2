@@ -9,6 +9,9 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.8', '3.9', '3.10']
     env:
       PYTHONPATH: ${{ github.workspace }}
       DATABASE_URL: postgresql://test_user:test_password@localhost:5432/test_db
@@ -31,10 +34,10 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Set up Python
+    - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
-        python-version: '3.9'
+        python-version: ${{ matrix.python-version }}
 
     - name: Install system dependencies
       run: |
@@ -47,12 +50,27 @@ jobs:
         pip install wheel setuptools
         pip install -r requirements.txt
 
-    - name: Run tests
+    - name: Debug environment
+      run: |
+        echo "PYTHONPATH: $PYTHONPATH"
+        python -c "import sys; print('Python path:', sys.path)"
+        ls -la
+        ls -la src/
+        pip list
+
+    - name: Prepare test environment
       run: |
         mkdir -p src/backend/ai/models
-        python -m pytest -v tests/ --cov=src
+        touch src/backend/ai/__init__.py
+        touch src/backend/__init__.py
+        touch src/__init__.py
+
+    - name: Run tests with debug output
+      run: |
+        python -m pytest -v tests/ --cov=src --tb=short -s
 
     - name: Upload coverage
+      if: success()
       uses: codecov/codecov-action@v1
       with:
         fail_ci_if_error: true
