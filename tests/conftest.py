@@ -1,11 +1,25 @@
+import os
+import sys
 import pytest
-from fastapi.testclient import TestClient
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.pool import StaticPool
+from pathlib import Path
 
-from src.backend.database import Base
-from src.backend.main import app
+# Add the project root to the Python path
+project_root = str(Path(__file__).parent.parent)
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+
+try:
+    from fastapi.testclient import TestClient
+    from sqlalchemy import create_engine
+    from sqlalchemy.orm import sessionmaker
+    from sqlalchemy.pool import StaticPool
+    from src.backend.database import Base
+    from src.backend.main import app
+except ImportError as e:
+    print(f"Import error: {e}")
+    print(f"Current PYTHONPATH: {os.environ.get('PYTHONPATH', '')}")
+    print(f"Current sys.path: {sys.path}")
+    raise
 
 TEST_DATABASE_URL = "sqlite:///:memory:"
 
