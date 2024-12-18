@@ -1,18 +1,10 @@
 import pytest
-from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
-from src.backend.main import app
-
 # Use in-memory SQLite for testing
 TEST_DATABASE_URL = "sqlite:///:memory:"
-
-@pytest.fixture(scope="function")
-def client():
-    with TestClient(app) as test_client:
-        yield test_client
 
 @pytest.fixture(scope="session")
 def test_engine():
