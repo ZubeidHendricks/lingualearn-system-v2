@@ -1,34 +1,18 @@
 name: Test
 
-on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+on: [push]
 
 jobs:
   test:
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v2
-
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.10'
-
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install fastapi pytest httpx starlette
-
-    - name: Create package structure
-      run: |
-        mkdir -p src/backend
-        touch src/__init__.py
-        touch src/backend/__init__.py
-
-    - name: Run tests
-      run: |
-        PYTHONPATH=$PWD pytest tests/test_basic.py -v
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.10'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install fastapi pytest httpx requests
+      - name: Test with pytest
+        run: pytest test_basic.py -v
