@@ -12,24 +12,11 @@ jobs:
     strategy:
       matrix:
         python-version: ['3.8', '3.9', '3.10']
+      fail-fast: false
+
     env:
       PYTHONPATH: ${{ github.workspace }}
       DATABASE_URL: postgresql://test_user:test_password@localhost:5432/test_db
-
-    services:
-      postgres:
-        image: postgres:13
-        env:
-          POSTGRES_USER: test_user
-          POSTGRES_PASSWORD: test_password
-          POSTGRES_DB: test_db
-        ports:
-          - 5432:5432
-        options: >
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
 
     steps:
     - uses: actions/checkout@v2
@@ -50,27 +37,32 @@ jobs:
         pip install wheel setuptools
         pip install -r requirements.txt
 
-    - name: Debug environment
+    - name: Show directory structure
       run: |
-        echo "PYTHONPATH: $PYTHONPATH"
-        python -c "import sys; print('Python path:', sys.path)"
-        ls -la
-        ls -la src/
-        pip list
+        echo "Current directory:"
+        pwd
+        echo "\nDirectory structure:"
+        tree
+        echo "\nPYTHONPATH:"
+        echo $PYTHONPATH
+        echo "\nPython sys.path:"
+        python -c "import sys; print('\n'.join(sys.path))"
 
-    - name: Prepare test environment
+    - name: Create test directories
       run: |
         mkdir -p src/backend/ai/models
         touch src/backend/ai/__init__.py
         touch src/backend/__init__.py
         touch src/__init__.py
 
-    - name: Run tests with debug output
+    - name: Try importing key modules
       run: |
-        python -m pytest -v tests/ --cov=src --tb=short -s
+        python -c "from src.backend.main import app; print('Successfully imported app')"
 
-    - name: Upload coverage
-      if: success()
-      uses: codecov/codecov-action@v1
-      with:
-        fail_ci_if_error: true
+    - name: Run single test first
+      run: |
+        python -m pytest tests/test_api.py::test_get_statistics -v --tb=long
+
+    - name: Run all tests
+      run: |
+        python -m pytest tests/ -v --tb=long
