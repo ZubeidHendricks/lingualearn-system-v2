@@ -11,7 +11,10 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: '3.10'
-      - name: Install pytest
-        run: pip install pytest
-      - name: Run tests
+      - name: Install dependencies
+        run: |
+          pip install pytest fastapi httpx
+      - name: Run simple tests
         run: pytest test_simple.py -v
+      - name: Run API tests
+        run: pytest test_api.py -v
